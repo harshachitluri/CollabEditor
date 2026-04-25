@@ -17,18 +17,24 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
+// Allowed origins: configured URL + any Vercel preview + localhost
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  if (!origin) return true; // curl, Postman, server-to-server
+  if (origin === CLIENT_URL) return true;
+  if (origin.endsWith('.vercel.app')) return true;
+  if (origin.startsWith('http://localhost:')) return true;
+  return false;
+};
+
 // Socket.IO
 export const io = new Server(server, {
-  cors: { origin: CLIENT_URL, methods: ['GET', 'POST'] },
+  cors: { origin: (origin, cb) => cb(null, isAllowedOrigin(origin)), methods: ['GET', 'POST'], credentials: true },
 });
 setupSocket(io);
 
-const allowedOrigins = [CLIENT_URL, 'http://localhost:3000', 'http://localhost:3002'];
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (curl, Postman, server-to-server)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
     callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
