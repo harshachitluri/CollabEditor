@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import authRouter from './routes/auth';
 import roomsRouter from './routes/rooms';
 import runRouter from './routes/run';
+import aiRouter from './routes/ai';
 import { setupSocket } from './socket';
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/rooms', roomsRouter);
 app.use('/api/run', runRouter);
+app.use('/api/ai', aiRouter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
