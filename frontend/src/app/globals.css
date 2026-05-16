@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: oklch(0.1 0.02 240);
+  --color-foreground: oklch(0.95 0.01 240);
+  
+  --color-card: oklch(0.15 0.02 240);
+  --color-card-foreground: oklch(0.95 0.01 240);
+  
+  --color-popover: oklch(0.15 0.02 240);
+  --color-popover-foreground: oklch(0.95 0.01 240);
+  
+  --color-primary: oklch(0.6 0.25 260);
+  --color-primary-foreground: oklch(0.98 0.01 240);
+  
+  --color-secondary: oklch(0.25 0.05 240);
+  --color-secondary-foreground: oklch(0.95 0.01 240);
+  
+  --color-muted: oklch(0.25 0.05 240);
+  --color-muted-foreground: oklch(0.65 0.02 240);
+  
+  --color-accent: oklch(0.3 0.1 260);
+  --color-accent-foreground: oklch(0.95 0.01 240);
+  
+  --color-destructive: oklch(0.55 0.2 25);
+  --color-destructive-foreground: oklch(0.98 0.01 240);
+  
+  --color-border: oklch(0.25 0.03 240);
+  --color-input: oklch(0.25 0.03 240);
+  --color-ring: oklch(0.6 0.25 260);
+  
+  --radius-lg: 0.75rem;
+  --radius-md: calc(0.75rem - 2px);
+  --radius-sm: calc(0.75rem - 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-white/10;
+  }
+  
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60;
+  }
+}
+
+:root {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 263.4 70% 50.4%;
+  --radius: 0.5rem;
+}

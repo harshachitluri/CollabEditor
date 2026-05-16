@@ -35,19 +35,38 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       break;
     case 'python':
       fileName = `${fileId}.py`;
-      command = 'python3';
+      // Try python3 first, fall back to python
+      try {
+        const { execSync } = require('child_process');
+        execSync('python3 --version', { stdio: 'ignore' });
+        command = 'python3';
+      } catch {
+        command = 'python';
+      }
       break;
     case 'cpp':
     case 'c++':
-      fileName = `${fileId}.cpp`;
-      command = 'g++';
-      isCpp = true;
+      // Check if g++ is available
+      const { execSync } = require('child_process');
+      try {
+        execSync('g++ --version', { stdio: 'ignore' });
+        fileName = `${fileId}.cpp`;
+        command = 'g++';
+        isCpp = true;
+      } catch {
+        res.json({
+          stdout: '',
+          stderr: 'g++ compiler not found. Please install MinGW (Windows) or build tools (Mac/Linux).\nFor now, try Python or JavaScript instead.',
+          exitCode: 1
+        });
+        return;
+      }
       break;
     default:
-      res.json({ 
+      res.json({
         stdout: `[Notice] Real execution for ${language} requires a local compiler.`,
         stderr: '',
-        exitCode: 0 
+        exitCode: 0
       });
       return;
   }
@@ -116,9 +135,13 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
           });
         });
 
-        execProc.on('error', (err) => {
+        execProc.on('error', (err: any) => {
           cleanup();
-          res.status(500).json({ error: err.message });
+          res.json({
+            stdout: '',
+            stderr: err.message || 'Execution failed',
+            exitCode: 1,
+          });
         });
 
         // Send input if provided
@@ -128,9 +151,13 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         }
       });
 
-      compileProc.on('error', (err) => {
+      compileProc.on('error', (err: any) => {
         cleanup();
-        res.status(500).json({ error: err.message });
+        res.json({
+          stdout: '',
+          stderr: err.message || 'Compilation failed',
+          exitCode: 1,
+        });
       });
     } else {
       // For other languages (Python, JS, TS)
@@ -155,9 +182,13 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         });
       });
 
-      proc.on('error', (err) => {
+      proc.on('error', (err: any) => {
         try { fs.unlinkSync(filePath); } catch (e) {}
-        res.status(500).json({ error: err.message });
+        res.json({
+          stdout: '',
+          stderr: err.message || 'Execution failed',
+          exitCode: 1,
+        });
       });
 
       // Send input if provided (for stdin)
