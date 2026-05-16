@@ -18,6 +18,10 @@ function setupSocket(io) {
             socket.to(slug).emit('user-joined', { socketId: socket.id, username, color });
             console.log(`[socket] ${username} joined room ${slug}`);
         });
+        // Code change from user
+        socket.on('code-change', ({ slug, code }) => {
+            socket.to(slug).emit('code-change', { code });
+        });
         // Yjs Sync over Socket.IO
         socket.on('yjs-update', ({ slug, update }) => {
             socket.to(slug).emit('yjs-update', update);

@@ -26,6 +26,11 @@ export function setupSocket(io: Server) {
       console.log(`[socket] ${username} joined room ${slug}`);
     });
 
+    // Code change from user
+    socket.on('code-change', ({ slug, code }: { slug: string; code: string }) => {
+      socket.to(slug).emit('code-change', { code });
+    });
+
     // Yjs Sync over Socket.IO
     socket.on('yjs-update', ({ slug, update }: { slug: string; update: Uint8Array }) => {
       socket.to(slug).emit('yjs-update', update);
