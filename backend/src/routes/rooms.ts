@@ -7,14 +7,57 @@ const router = Router();
 
 // POST /api/rooms — create room (auth required)
 router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
-  const { name, language = 'javascript', isPublic = true, pin } = req.body;
+  const { name, language = 'javascript', isPublic = true, password } = req.body;
   if (!name) { res.status(400).json({ error: 'Room name required' }); return; }
   try {
     const slug = nanoid(8);
     const room = await prisma.room.create({
-      data: { slug, name, language, isPublic, pin: pin || null, ownerId: req.userId! },
+      data: {
+        slug,
+        name,
+        language,
+        isPublic,
+        pin: password ? password : null,
+        ownerId: req.userId!,
+      },
     });
     res.status(201).json(room);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST /api/rooms/join — join a room by slug + optional password
+router.post('/join', async (req: Request, res: Response): Promise<void> => {
+  const { slug, password } = req.body as { slug: string; password?: string };
+
+  if (!slug || !slug.trim()) {
+    res.status(400).json({ error: 'Room ID is required' });
+    return;
+  }
+
+  try {
+    const room = await prisma.room.findUnique({
+      where: { slug: slug.trim() },
+      include: { owner: { select: { id: true, username: true } } },
+    });
+
+    if (!room) {
+      res.status(404).json({ error: 'Room not found. Check the Room ID and try again.' });
+      return;
+    }
+
+    // If room has a password, validate it
+    if (room.pin) {
+      if (!password || password !== room.pin) {
+        res.status(401).json({ error: 'Incorrect password. Please try again.' });
+        return;
+      }
+    }
+
+    // Return the room data (so frontend can redirect)
+    res.json(room);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

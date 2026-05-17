@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -39,6 +40,7 @@ app.use(cors({
   },
   credentials: true,
 }));
+app.use(helmet());
 app.use(express.json());
 
 // Routes
@@ -59,6 +61,12 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+
+// Global error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[Global Error]', err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 export default app;

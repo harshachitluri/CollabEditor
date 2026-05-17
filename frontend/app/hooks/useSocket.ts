@@ -46,12 +46,12 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
 
     // Someone joined
     socket.on('user-joined', (user: RoomUser) => {
-      setUsers(prev => [...prev.filter(u => u.socketId !== user.socketId), user]);
+      setUsers((prev) => [...prev.filter((u) => u.socketId !== user.socketId), user]);
     });
 
     // Someone left
     socket.on('user-left', ({ socketId }: { socketId: string }) => {
-      setUsers(prev => prev.filter(u => u.socketId !== socketId));
+      setUsers((prev) => prev.filter((u) => u.socketId !== socketId));
     });
 
     // Code broadcast from another user
@@ -66,7 +66,7 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
 
     // Chat messages
     socket.on('chat-message', (msg: ChatMsg) => {
-      setChatMessages(prev => [...prev, msg]);
+      setChatMessages((prev) => [...prev, msg]);
     });
 
     return () => {
@@ -91,5 +91,13 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
     socketRef.current?.emit('chat-message', { slug, message, username });
   };
 
-  return { users, chatMessages, emitCodeChange, emitLanguageChange, emitCursorMove, sendChatMessage, socket: socketRef };
+  return {
+    users,
+    chatMessages,
+    emitCodeChange,
+    emitLanguageChange,
+    emitCursorMove,
+    sendChatMessage,
+    socket: socketRef,
+  };
 }

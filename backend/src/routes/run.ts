@@ -44,29 +44,54 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         command = 'python';
       }
       break;
-    case 'cpp':
-    case 'c++':
-      // Check if g++ is available
-      const { execSync } = require('child_process');
+    case 'c': {
+      const { execSync: execSyncC } = require('child_process');
       try {
-        execSync('g++ --version', { stdio: 'ignore' });
-        fileName = `${fileId}.cpp`;
-        command = 'g++';
-        isCpp = true;
+        execSyncC('gcc --version', { stdio: 'ignore' });
+        fileName = `${fileId}.c`;
+        command = 'gcc';
+        isCpp = true; // reuse the compile-then-run path
       } catch {
         res.json({
           stdout: '',
-          stderr: 'g++ compiler not found. Please install MinGW (Windows) or build tools (Mac/Linux).\nFor now, try Python or JavaScript instead.',
-          exitCode: 1
+          stderr: 'gcc compiler not found. Please install Xcode Command Line Tools: xcode-select --install',
+          exitCode: 1,
         });
         return;
       }
       break;
+    }
+    case 'cpp':
+    case 'c++': {
+      const { execSync: execSyncCpp } = require('child_process');
+      try {
+        execSyncCpp('g++ --version', { stdio: 'ignore' });
+        fileName = `${fileId}.cpp`;
+        command = 'g++';
+        isCpp = true;
+      } catch {
+        // g++ not found — try gcc as fallback for C++
+        try {
+          execSyncCpp('gcc --version', { stdio: 'ignore' });
+          fileName = `${fileId}.cpp`;
+          command = 'gcc';
+          isCpp = true;
+        } catch {
+          res.json({
+            stdout: '',
+            stderr: 'g++ compiler not found. Please install build tools.',
+            exitCode: 1,
+          });
+          return;
+        }
+      }
+      break;
+    }
     default:
       res.json({
-        stdout: `[Notice] Real execution for ${language} requires a local compiler.`,
+        stdout: `[Notice] Real execution for ${language} requires a local compiler.\nSupported languages: JavaScript, TypeScript, Python, C, C++`,
         stderr: '',
-        exitCode: 0
+        exitCode: 0,
       });
       return;
   }
@@ -120,17 +145,19 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
         execProc.stdout?.on('data', (data) => {
           stdout += data.toString();
+          if (stdout.length > 50000) execProc.kill();
         });
 
         execProc.stderr?.on('data', (data) => {
           stderr += data.toString();
+          if (stderr.length > 50000) execProc.kill();
         });
 
         execProc.on('close', (exitCode) => {
           cleanup();
           res.json({
-            stdout: stdout.trim(),
-            stderr: stderr.trim(),
+            stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
+            stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
             exitCode: exitCode || 0,
           });
         });
@@ -165,10 +192,12 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
       proc.stdout?.on('data', (data) => {
         stdout += data.toString();
+        if (stdout.length > 50000) proc.kill();
       });
 
       proc.stderr?.on('data', (data) => {
         stderr += data.toString();
+        if (stderr.length > 50000) proc.kill();
       });
 
       proc.on('close', (exitCode) => {
@@ -176,8 +205,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         try { fs.unlinkSync(filePath); } catch (e) {}
 
         res.json({
-          stdout: stdout.trim(),
-          stderr: stderr.trim(),
+          stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
+          stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
           exitCode: exitCode || 0,
         });
       });
