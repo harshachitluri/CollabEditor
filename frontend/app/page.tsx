@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import ThemeToggle from './components/ThemeToggle';
 
 const features = [
   {
@@ -44,6 +45,9 @@ export default function Home() {
           <div className="cc-logo-icon">⬡</div>
           CollabCode
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <ThemeToggle compact />
+        </div>
         <div className="cc-nav-actions">
           <Link href="/login">
             <button className="btn-ghost">Log in</button>
@@ -77,20 +81,20 @@ export default function Home() {
             fontWeight: 800,
             lineHeight: 1.08,
             letterSpacing: '-2px',
-            color: '#111827',
+            color: 'var(--text-primary)',
             marginBottom: 28,
           }}
         >
           Code together,
           <br />
-          <span style={{ color: '#2563eb' }}>without the conflicts.</span>
+          <span style={{ color: 'var(--accent)' }}>without the conflicts.</span>
         </h1>
 
-        <p
+          <p
           className="fade-up fade-up-3"
           style={{
             fontSize: 18,
-            color: '#6b7280',
+            color: 'var(--text-secondary)',
             lineHeight: 1.75,
             maxWidth: 560,
             margin: '0 auto 48px',
@@ -148,14 +152,14 @@ export default function Home() {
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: 17,
                     fontWeight: 700,
-                    color: '#111827',
+                    color: 'var(--text-primary)',
                     marginBottom: 10,
                     letterSpacing: '-0.2px',
                   }}
                 >
                   {f.title}
                 </h3>
-                <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.65 }}>{f.desc}</p>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65 }}>{f.desc}</p>
               </div>
             </div>
           ))}
@@ -170,10 +174,10 @@ export default function Home() {
         </blockquote>
         <cite>— Patrick McKenzie</cite>
         <p
-          style={{
+            style={{
             marginTop: 32,
             fontSize: 13,
-            color: '#d1d5db',
+            color: 'var(--text-muted)',
             fontWeight: 500,
             letterSpacing: '0.04em',
           }}

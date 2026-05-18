@@ -1,13 +1,61 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 
 const LANGUAGES = ['javascript', 'typescript', 'python', 'java', 'c', 'cpp', 'go', 'rust', 'ruby'];
 const THEMES = [
-  { value: 'vs-dark', label: 'VS Dark' },
+  { value: 'monochrome-dark', label: 'Monochrome Dark' },
   { value: 'hc-black', label: 'High Contrast' },
 ];
+
+// Define custom monochrome dark theme
+const MONOCHROME_DARK_THEME: editor.IStandaloneThemeData = {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [
+    // Keywords
+    { token: 'keyword', foreground: '#bfc5ca', fontStyle: '' },
+    { token: 'keyword.control', foreground: '#bfc5ca', fontStyle: '' },
+    // Strings
+    { token: 'string', foreground: '#98a0a6' },
+    { token: 'string.escape', foreground: '#98a0a6' },
+    // Comments
+    { token: 'comment', foreground: '#6b7280', fontStyle: 'italic' },
+    // Numbers
+    { token: 'number', foreground: '#bfc5ca' },
+    // Variables/Identifiers
+    { token: 'identifier', foreground: '#e6e6e6' },
+    { token: 'variable', foreground: '#e6e6e6' },
+    // Functions
+    { token: 'function', foreground: '#bfc5ca' },
+    // Types
+    { token: 'type', foreground: '#bfc5ca' },
+    // Punctuation
+    { token: 'delimiter', foreground: '#7c8a91' },
+    { token: 'operator', foreground: '#7c8a91' },
+    // Tags (HTML/XML)
+    { token: 'tag', foreground: '#bfc5ca' },
+    { token: 'tag.id', foreground: '#98a0a6' },
+    { token: 'tag.class', foreground: '#98a0a6' },
+  ],
+  colors: {
+    'editor.background': '#0a0b0d',
+    'editor.foreground': '#e6e6e6',
+    'editor.lineNumbersBackground': '#0a0b0d',
+    'editor.lineNumberColor': '#4b5563',
+    'editor.selectionBackground': '#2c3038',
+    'editor.lineHighlightBackground': '#0f1113',
+    'editor.cursorForeground': '#7c8a91',
+    'editorWhitespace.foreground': '#2c3038',
+    'editorIndentGuide.background': '#1a1e24',
+    'editorBracketMatch.background': '#2c3038',
+    'editorBracketMatch.border': '#4b5563',
+  },
+};
+
+let themeRegistered = false;
 
 interface Props {
   value: string;
@@ -31,6 +79,13 @@ export default function CollabEditor({
   running,
 }: Props) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+
+  useEffect(() => {
+    if (!themeRegistered && monaco) {
+      monaco.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
+      themeRegistered = true;
+    }
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -115,11 +170,15 @@ export default function CollabEditor({
         <Editor
           height="100%"
           language={language === 'cpp' ? 'cpp' : language}
-          theme={theme}
+          theme={theme || 'monochrome-dark'}
           value={value}
           onChange={(v) => onChange(v ?? '')}
           onMount={(ed) => {
             editorRef.current = ed;
+            if (!themeRegistered && monaco) {
+              monaco.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
+              themeRegistered = true;
+            }
           }}
           options={{
             fontSize: 14,

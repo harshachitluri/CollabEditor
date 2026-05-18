@@ -6,6 +6,7 @@ import CollabEditor from '../../components/CollabEditor';
 import AIChatBot from '../../components/AIChatBot';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket, RoomUser, ChatMsg } from '../../hooks/useSocket';
+import ThemeToggle from '../../components/ThemeToggle';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -189,6 +190,10 @@ export default function RoomPage() {
         </span>
 
         <div style={{ flex: 1 }} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginRight: 8 }}>
+          <ThemeToggle compact />
+        </div>
 
         {/* Live user avatars */}
         <div style={{ display: 'flex', gap: -8, alignItems: 'center', marginRight: 16 }}>

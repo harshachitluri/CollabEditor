@@ -52,17 +52,17 @@ export default function LoginPage() {
               fontFamily: 'Outfit, sans-serif',
               fontSize: 22,
               fontWeight: 700,
-              color: '#111827',
+              color: 'var(--text-primary)',
               marginBottom: 10,
             }}
           >
             <div className="cc-logo-icon" style={{ width: 38, height: 38, fontSize: 17 }}>⬡</div>
             CollabCode
           </div>
-          <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Outfit, sans-serif', color: '#111827', letterSpacing: '-0.5px', marginBottom: 6 }}>
+          <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 6 }}>
             Welcome back
           </p>
-          <p style={{ fontSize: 14, color: '#9ca3af', fontWeight: 400 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 400 }}>
             Sign in to your workspace
           </p>
         </div>
@@ -114,17 +114,17 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '28px 0' }}>
-          <div style={{ flex: 1, height: 1, background: '#f0f0f0' }} />
+          <div style={{ flex: 1, height: 1, background: 'var(--bg-border)' }} />
           <span style={{ fontSize: 12, color: '#c4c9d4', fontWeight: 500 }}>OR</span>
-          <div style={{ flex: 1, height: 1, background: '#f0f0f0' }} />
+          <div style={{ flex: 1, height: 1, background: 'var(--bg-border)' }} />
         </div>
 
         {/* Sign up link */}
-        <p style={{ textAlign: 'center', fontSize: 14, color: '#6b7280' }}>
+        <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-secondary)' }}>
           Don't have an account?{' '}
           <Link
             href="/register"
-            style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+            style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
           >
             Create one free →
           </Link>
@@ -138,7 +138,7 @@ export default function LoginPage() {
         style={{
           marginTop: 40,
           fontSize: 13,
-          color: '#b0b8c8',
+          color: 'var(--text-muted)',
           fontStyle: 'italic',
           textAlign: 'center',
           maxWidth: 420,
