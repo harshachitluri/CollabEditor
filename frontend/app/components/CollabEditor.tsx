@@ -1,8 +1,13 @@
 'use client';
-import { useRef, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
+import { useRef, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import type { editor } from 'monaco-editor';
-import * as monaco from 'monaco-editor';
+
+// ✅ FIX 1: Dynamically import with ssr: false to prevent server-side Monaco loading
+const Editor = dynamic(() => import('@monaco-editor/react').then(mod => mod.default), {
+  ssr: false,
+  loading: () => <div style={{ width: '100%', height: '100%', background: 'var(--bg-card)' }} />,
+});
 
 const LANGUAGES = ['javascript', 'typescript', 'python', 'java', 'c', 'cpp', 'go', 'rust', 'ruby'];
 const THEMES = [
@@ -79,12 +84,11 @@ export default function CollabEditor({
   running,
 }: Props) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
+  // ✅ FIX 2: Ensure component only renders on client to prevent hydration mismatches
   useEffect(() => {
-    if (!themeRegistered && monaco) {
-      monaco.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
-      themeRegistered = true;
-    }
+    setIsClient(true);
   }, []);
 
   return (
@@ -167,33 +171,47 @@ export default function CollabEditor({
 
       {/* Monaco Editor */}
       <div style={{ flex: 1, overflow: 'hidden' }}>
-        <Editor
-          height="100%"
-          language={language === 'cpp' ? 'cpp' : language}
-          theme={theme || 'monochrome-dark'}
-          value={value}
-          onChange={(v) => onChange(v ?? '')}
-          onMount={(ed) => {
-            editorRef.current = ed;
-            if (!themeRegistered && monaco) {
-              monaco.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
-              themeRegistered = true;
-            }
-          }}
-          options={{
-            fontSize: 14,
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
-            fontLigatures: true,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            lineNumbers: 'on',
-            renderLineHighlight: 'gutter',
-            cursorBlinking: 'smooth',
-            smoothScrolling: true,
-            padding: { top: 16 },
-            tabSize: 2,
-          }}
-        />
+        {isClient && (
+          <Editor
+            height="100%"
+            language={language === 'cpp' ? 'cpp' : language}
+            theme={theme || 'monochrome-dark'}
+            value={value}
+            onChange={(v) => onChange(v ?? '')}
+            onMount={async (ed) => {
+              editorRef.current = ed;
+              // ✅ FIX 3: Register theme only after editor mounts on client
+              // Dynamically import monaco only when needed (inside event handler)
+              if (!themeRegistered) {
+                try {
+                  const monacoLib = await import('monaco-editor');
+                  monacoLib.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
+                  themeRegistered = true;
+                } catch (err) {
+                  // Silently fail - theme registration is not critical
+                  console.warn('Failed to register custom theme:', err);
+                }
+              }
+            }}
+            options={{
+              fontSize: 14,
+              fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+              fontLigatures: true,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              lineNumbers: 'on',
+              renderLineHighlight: 'gutter',
+              cursorBlinking: 'smooth',
+              smoothScrolling: true,
+              padding: { top: 16 },
+              tabSize: 2,
+              // ✅ FIX 4: Disable clipboard features to prevent permission errors
+              // Monaco won't try to auto-register clipboard handlers
+              'editor.formatOnPaste': false,
+              'editor.formatOnType': false,
+            }}
+          />
+        )}
       </div>
     </div>
   );

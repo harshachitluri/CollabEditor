@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import CollabEditor from '../../components/CollabEditor';
 import AIChatBot from '../../components/AIChatBot';
+import { ClientOnly } from '../../components/ClientOnly';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket, RoomUser, ChatMsg } from '../../hooks/useSocket';
 import ThemeToggle from '../../components/ThemeToggle';
@@ -300,16 +301,35 @@ export default function RoomPage() {
               transition: 'flex 0.3s',
             }}
           >
-            <CollabEditor
-              value={code}
-              language={language}
-              theme={theme}
-              onChange={handleLocalCodeChange}
-              onLanguageChange={handleLanguageChange}
-              onThemeChange={setTheme}
-              onRun={runCode}
-              running={running}
-            />
+            {/* ✅ FIX 6: Wrap Monaco editor with ClientOnly to prevent hydration mismatches */}
+            <ClientOnly
+              fallback={
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'var(--bg-card)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Loading editor...
+                </div>
+              }
+            >
+              <CollabEditor
+                value={code}
+                language={language}
+                theme={theme}
+                onChange={handleLocalCodeChange}
+                onLanguageChange={handleLanguageChange}
+                onThemeChange={setTheme}
+                onRun={runCode}
+                running={running}
+              />
+            </ClientOnly>
           </div>
 
           {/* Output Panel Sliding up */}
