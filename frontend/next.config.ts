@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* ✅ FIX 5: Turbopack + Monaco optimization */
-  experimental: {
-    // Optimizes watch mode for large monorepos
-    swcDiagnostics: true,
-  },
+  // Provide empty turbopack config to silence the Next.js 15+ error
+  // about custom webpack configs while turbopack is enabled.
+  turbopack: {},
   
   // ✅ Ensure external dependencies are properly handled
   webpack: (config, { isServer }) => {

@@ -5,6 +5,7 @@ interface User {
   id: string;
   email: string;
   username: string;
+  avatarUrl?: string | null;
 }
 interface AuthCtx {
   user: User | null;
