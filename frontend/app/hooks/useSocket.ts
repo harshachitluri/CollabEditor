@@ -17,17 +17,35 @@ export interface ChatMsg {
   time: number;
 }
 
+export interface RemoteCursor {
+  socketId: string;
+  username: string;
+  color: string;
+  line: number;
+  column: number;
+}
+
 interface UseSocketOptions {
   slug: string;
   username: string;
   onCodeChange: (code: string) => void;
   onLanguageChange: (lang: string) => void;
+  onCursorMove?: (cursor: RemoteCursor) => void;
+  onUserLeft?: (socketId: string) => void;
 }
 
-export function useSocket({ slug, username, onCodeChange, onLanguageChange }: UseSocketOptions) {
+export function useSocket({
+  slug,
+  username,
+  onCodeChange,
+  onLanguageChange,
+  onCursorMove,
+  onUserLeft,
+}: UseSocketOptions) {
   const socketRef = useRef<Socket | null>(null);
   const [users, setUsers] = useState<RoomUser[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
+  const [socketId, setSocketId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug || !username) return;
@@ -36,7 +54,12 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
     socketRef.current = socket;
 
     socket.on('connect', () => {
+      setSocketId(socket.id ?? null);
       socket.emit('join-room', { slug, username });
+    });
+
+    socket.on('disconnect', () => {
+      setSocketId(null);
     });
 
     // Receive current user list on join
@@ -52,6 +75,7 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
     // Someone left
     socket.on('user-left', ({ socketId }: { socketId: string }) => {
       setUsers((prev) => prev.filter((u) => u.socketId !== socketId));
+      onUserLeft?.(socketId);
     });
 
     // Code broadcast from another user
@@ -64,6 +88,10 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
       onLanguageChange(language);
     });
 
+    socket.on('cursor-move', (cursor: RemoteCursor) => {
+      onCursorMove?.(cursor);
+    });
+
     // Chat messages
     socket.on('chat-message', (msg: ChatMsg) => {
       setChatMessages((prev) => [...prev, msg]);
@@ -72,8 +100,9 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
     return () => {
       socket.disconnect();
       socketRef.current = null;
+      setSocketId(null);
     };
-  }, [slug, username]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [slug, username, onCursorMove, onLanguageChange, onCodeChange, onUserLeft]);
 
   const emitCodeChange = (code: string) => {
     socketRef.current?.emit('code-change', { slug, code });
@@ -99,5 +128,6 @@ export function useSocket({ slug, username, onCodeChange, onLanguageChange }: Us
     emitCursorMove,
     sendChatMessage,
     socket: socketRef,
+    socketId,
   };
 }

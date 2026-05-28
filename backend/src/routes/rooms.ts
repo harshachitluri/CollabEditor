@@ -8,7 +8,10 @@ const router = Router();
 // POST /api/rooms — create room (auth required)
 router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   const { name, language = 'javascript', isPublic = true, password } = req.body;
-  if (!name) { res.status(400).json({ error: 'Room name required' }); return; }
+  if (!name) {
+    res.status(400).json({ error: 'Room name required' });
+    return;
+  }
   try {
     const slug = nanoid(8);
     const room = await prisma.room.create({
@@ -85,7 +88,10 @@ router.get('/:slug', async (req: Request, res: Response): Promise<void> => {
       where: { slug: req.params.slug as string },
       include: { owner: { select: { id: true, username: true } } },
     });
-    if (!room) { res.status(404).json({ error: 'Room not found' }); return; }
+    if (!room) {
+      res.status(404).json({ error: 'Room not found' });
+      return;
+    }
     res.json(room);
   } catch (err) {
     console.error(err);
@@ -97,8 +103,14 @@ router.get('/:slug', async (req: Request, res: Response): Promise<void> => {
 router.delete('/:slug', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const room = await prisma.room.findUnique({ where: { slug: req.params.slug as string } });
-    if (!room) { res.status(404).json({ error: 'Room not found' }); return; }
-    if (room.ownerId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return; }
+    if (!room) {
+      res.status(404).json({ error: 'Room not found' });
+      return;
+    }
+    if (room.ownerId !== req.userId) {
+      res.status(403).json({ error: 'Forbidden' });
+      return;
+    }
     await prisma.room.delete({ where: { slug: req.params.slug as string } });
     res.json({ message: 'Room deleted' });
   } catch (err) {

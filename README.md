@@ -61,6 +61,19 @@ DATABASE_URL="file:./dev.db"
 # ANTHROPIC_API_KEY=your_key_here
 ```
 
+## 🚀 Production Start
+
+Build both apps, then start them with the production scripts:
+
+```bash
+npm --prefix backend run build
+npm --prefix frontend run build
+npm --prefix backend run start:prod
+npm --prefix frontend run start:prod
+```
+
+For PM2/systemd, see `deploy/pm2/ecosystem.config.cjs` and `deploy/systemd/`.
+
 ## 📄 License
 
 MIT

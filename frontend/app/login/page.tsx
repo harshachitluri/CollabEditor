@@ -25,7 +25,10 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Login failed'); return; }
+      if (!res.ok) {
+        setError(data.error || 'Login failed');
+        return;
+      }
       login(data.token, data.user);
       router.push('/dashboard');
     } catch {
@@ -41,7 +44,6 @@ export default function LoginPage() {
       style={{ alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}
     >
       <div className="auth-card fade-up">
-
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div
@@ -56,10 +58,21 @@ export default function LoginPage() {
               marginBottom: 10,
             }}
           >
-            <div className="cc-logo-icon" style={{ width: 38, height: 38, fontSize: 17 }}>⬡</div>
+            <div className="cc-logo-icon" style={{ width: 38, height: 38, fontSize: 17 }}>
+              ⬡
+            </div>
             CollabCode
           </div>
-          <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 6 }}>
+          <p
+            style={{
+              fontSize: 28,
+              fontWeight: 700,
+              fontFamily: 'Outfit, sans-serif',
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.5px',
+              marginBottom: 6,
+            }}
+          >
             Welcome back
           </p>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 400 }}>
@@ -69,9 +82,10 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
           <div className="form-group">
-            <label className="form-label" htmlFor="email">Email address</label>
+            <label className="form-label" htmlFor="email">
+              Email address
+            </label>
             <input
               id="email"
               className="cc-input"
@@ -86,7 +100,9 @@ export default function LoginPage() {
 
           <div className="form-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label className="form-label" htmlFor="password">Password</label>
+              <label className="form-label" htmlFor="password">
+                Password
+              </label>
             </div>
             <input
               id="password"
@@ -121,7 +137,7 @@ export default function LoginPage() {
 
         {/* Sign up link */}
         <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-secondary)' }}>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link
             href="/register"
             style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
@@ -129,7 +145,6 @@ export default function LoginPage() {
             Create one free →
           </Link>
         </p>
-
       </div>
 
       {/* Subtle bottom quote */}
@@ -145,7 +160,7 @@ export default function LoginPage() {
           lineHeight: 1.6,
         }}
       >
-        "Code is the closest thing to a superpower that exists in the real world."
+        &ldquo;Code is the closest thing to a superpower that exists in the real world.&rdquo;
       </p>
     </div>
   );

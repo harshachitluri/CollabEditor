@@ -29,7 +29,9 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       data: { email, username, passwordHash },
     });
     const token = generateToken(user.id);
-    res.status(201).json({ token, user: { id: user.id, email: user.email, username: user.username } });
+    res
+      .status(201)
+      .json({ token, user: { id: user.id, email: user.email, username: user.username } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

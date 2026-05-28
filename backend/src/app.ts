@@ -29,17 +29,23 @@ const isAllowedOrigin = (origin: string | undefined): boolean => {
 
 // Socket.IO
 export const io = new Server(server, {
-  cors: { origin: (origin, cb) => cb(null, isAllowedOrigin(origin)), methods: ['GET', 'POST'], credentials: true },
+  cors: {
+    origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
 });
 setupSocket(io);
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) return callback(null, true);
-    callback(new Error(`CORS: origin ${origin} not allowed`));
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  }),
+);
 app.use(helmet());
 app.use(express.json());
 
@@ -50,12 +56,14 @@ app.use('/api/run', runRouter);
 app.use('/api/ai', aiRouter);
 
 // Root route — visible when you open the Render URL in a browser
-app.get('/', (_req, res) => res.json({
-  name: 'CollabCode API',
-  status: 'ok',
-  version: '1.0.0',
-  endpoints: ['/api/auth', '/api/rooms', '/api/run', '/api/ai', '/health'],
-}));
+app.get('/', (_req, res) =>
+  res.json({
+    name: 'CollabCode API',
+    status: 'ok',
+    version: '1.0.0',
+    endpoints: ['/api/auth', '/api/rooms', '/api/run', '/api/ai', '/health'],
+  }),
+);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

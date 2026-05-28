@@ -28,8 +28,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const t = localStorage.getItem('token');
     const u = localStorage.getItem('user');
     if (t && u) {
-      setToken(t);
-      setUser(JSON.parse(u));
+      queueMicrotask(() => {
+        setToken(t);
+        setUser(JSON.parse(u));
+      });
     }
   }, []);
 

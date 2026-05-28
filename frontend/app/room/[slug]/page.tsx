@@ -6,7 +6,7 @@ import CollabEditor from '../../components/CollabEditor';
 import AIChatBot from '../../components/AIChatBot';
 import { ClientOnly } from '../../components/ClientOnly';
 import { useAuth } from '../../context/AuthContext';
-import { useSocket, RoomUser, ChatMsg } from '../../hooks/useSocket';
+import { useSocket, type RemoteCursor } from '../../hooks/useSocket';
 import ThemeToggle from '../../components/ThemeToggle';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -31,13 +31,14 @@ interface RunResult {
 
 export default function RoomPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const [roomName, setRoomName] = useState('');
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
-  const [theme, setTheme] = useState('light'); // Changed to light
+  const [theme, setTheme] = useState('monochrome-dark');
+  const [remoteCursors, setRemoteCursors] = useState<RemoteCursor[]>([]);
   const [output, setOutput] = useState<RunResult | null>(null);
   const [running, setRunning] = useState(false);
   const [outputOpen, setOutputOpen] = useState(false);
@@ -48,7 +49,8 @@ export default function RoomPage() {
   const [chatInput, setChatInput] = useState('');
 
   const isRemoteChange = useRef(false);
-  const username = user?.username ?? `Guest_${Math.floor(Math.random() * 9999)}`;
+  const [guestName] = useState(() => `Guest_${Math.floor(Math.random() * 9999)}`);
+  const username = user?.username ?? guestName;
 
   const handleRemoteCode = useCallback((incoming: string) => {
     isRemoteChange.current = true;
@@ -63,11 +65,33 @@ export default function RoomPage() {
     setCode(DEFAULT_CODE[lang] ?? '');
   }, []);
 
-  const { users, chatMessages, emitCodeChange, emitLanguageChange, sendChatMessage } = useSocket({
+  const handleRemoteCursor = useCallback((cursor: RemoteCursor) => {
+    setRemoteCursors((prev) => {
+      const next = prev.filter((c) => c.socketId !== cursor.socketId);
+      next.push(cursor);
+      return next;
+    });
+  }, []);
+
+  const handleRemoteLeft = useCallback((socketId: string) => {
+    setRemoteCursors((prev) => prev.filter((c) => c.socketId !== socketId));
+  }, []);
+
+  const {
+    users,
+    chatMessages,
+    emitCodeChange,
+    emitLanguageChange,
+    emitCursorMove,
+    sendChatMessage,
+    socketId,
+  } = useSocket({
     slug,
     username,
     onCodeChange: handleRemoteCode,
     onLanguageChange: handleRemoteLanguage,
+    onCursorMove: handleRemoteCursor,
+    onUserLeft: handleRemoteLeft,
   });
 
   useEffect(() => {
@@ -328,6 +352,9 @@ export default function RoomPage() {
                 onThemeChange={setTheme}
                 onRun={runCode}
                 running={running}
+                remoteCursors={remoteCursors}
+                localSocketId={socketId}
+                onCursorMove={emitCursorMove}
               />
             </ClientOnly>
           </div>

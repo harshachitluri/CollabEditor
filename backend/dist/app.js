@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
@@ -19,23 +20,32 @@ const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+// Allowed origins: configured URL + any Vercel preview + localhost
+const isAllowedOrigin = (origin) => {
+    if (!origin)
+        return true; // curl, Postman, server-to-server
+    if (origin === CLIENT_URL)
+        return true;
+    if (origin.endsWith('.vercel.app'))
+        return true;
+    if (origin.startsWith('http://localhost:'))
+        return true;
+    return false;
+};
 // Socket.IO
 exports.io = new socket_io_1.Server(server, {
-    cors: { origin: CLIENT_URL, methods: ['GET', 'POST'] },
+    cors: { origin: (origin, cb) => cb(null, isAllowedOrigin(origin)), methods: ['GET', 'POST'], credentials: true },
 });
 (0, socket_1.setupSocket)(exports.io);
-const allowedOrigins = [CLIENT_URL, 'http://localhost:3000', 'http://localhost:3002'];
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
-        // Allow requests with no origin (curl, Postman, server-to-server)
-        if (!origin)
-            return callback(null, true);
-        if (allowedOrigins.includes(origin))
+        if (isAllowedOrigin(origin))
             return callback(null, true);
         callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
 }));
+app.use((0, helmet_1.default)());
 app.use(express_1.default.json());
 // Routes
 app.use('/api/auth', auth_1.default);
@@ -52,5 +62,10 @@ app.get('/', (_req, res) => res.json({
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('[Global Error]', err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
 });
 exports.default = app;
