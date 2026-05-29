@@ -101,19 +101,18 @@ export default function DashboardPage() {
   };
 
   const LANG_COLORS: Record<string, string> = {
-     javascript: '#eab308', // Keeping JavaScript color
-     typescript: '#6b7280', // Neutralized TypeScript color
-     python: '#6b7280', // Neutralized Python color
-     c: '#6b7280', // Neutralized C color
-     java: '#6b7280', // Neutralized Java color
-     cpp: '#6b7280', // Neutralized C++ color
-     go: '#6b7280', // Neutralized Go color
-     rust: '#6b7280', // Neutralized Rust color
+    javascript: '#eab308', // Keeping JavaScript color
+    typescript: '#6b7280', // Neutralized TypeScript color
+    python: '#6b7280', // Neutralized Python color
+    c: '#6b7280', // Neutralized C color
+    java: '#6b7280', // Neutralized Java color
+    cpp: '#6b7280', // Neutralized C++ color
+    go: '#6b7280', // Neutralized Go color
+    rust: '#6b7280', // Neutralized Rust color
   };
 
   return (
     <div className="page-root animate-fade-in">
-
       {/* Navbar */}
       <nav className="cc-nav">
         <Link href="/" className="cc-logo">
@@ -122,24 +121,44 @@ export default function DashboardPage() {
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <ThemeToggle compact />
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            background: 'var(--bg-secondary)', padding: '6px 14px 6px 8px',
-            borderRadius: 100, border: '1px solid var(--bg-border)',
-          }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'var(--bg-card)', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', fontWeight: 700, fontSize: 14, color: 'var(--text-primary)',
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              background: 'var(--bg-secondary)',
+              padding: '6px 14px 6px 8px',
+              borderRadius: 100,
               border: '1px solid var(--bg-border)',
-            }}>
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: 'var(--bg-card)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: 14,
+                color: 'var(--text-primary)',
+                border: '1px solid var(--bg-border)',
+              }}
+            >
               {user?.username?.[0]?.toUpperCase()}
             </div>
-            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>{user?.username}</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
+              {user?.username}
+            </span>
           </div>
           <button
             className="btn-ghost"
-            onClick={() => { logout(); router.push('/'); }}
+            onClick={() => {
+              logout();
+              router.push('/');
+            }}
           >
             Sign out
           </button>
@@ -147,20 +166,34 @@ export default function DashboardPage() {
       </nav>
 
       {/* Main */}
-      <main style={{ flex: 1, width: '100%', maxWidth: 1200, margin: '0 auto', padding: '60px 40px' }}>
-
+      <main
+        style={{ flex: 1, width: '100%', maxWidth: 1200, margin: '0 auto', padding: '60px 40px' }}
+      >
         {/* Header */}
         <div className="fade-up" style={{ marginBottom: 52, textAlign: 'center' }}>
-          <h1 style={{
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: 'clamp(32px, 4vw, 48px)',
-            fontWeight: 800, letterSpacing: '-1px',
-            color: 'var(--text-primary)', marginBottom: 12,
-          }}>
+          <h1
+            style={{
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: 'clamp(32px, 4vw, 48px)',
+              fontWeight: 800,
+              letterSpacing: '-1px',
+              color: 'var(--text-primary)',
+              marginBottom: 12,
+            }}
+          >
             Your Workspace
           </h1>
-          <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 480, margin: '0 auto', fontWeight: 400 }}>
-            Create a new collaborative session or join an existing room to start building in real-time.
+          <p
+            style={{
+              fontSize: 16,
+              color: 'var(--text-secondary)',
+              maxWidth: 480,
+              margin: '0 auto',
+              fontWeight: 400,
+            }}
+          >
+            Create a new collaborative session or join an existing room to start building in
+            real-time.
           </p>
         </div>
 
@@ -174,8 +207,19 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div className="cc-icon-box">✨</div>
               <div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Create Session</h3>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Start a new room instantly</p>
+                <h3
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 3,
+                  }}
+                >
+                  Create Session
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  Start a new room instantly
+                </p>
               </div>
             </div>
 
@@ -228,7 +272,16 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div className="cc-icon-box">🔑</div>
               <div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Join Session</h3>
+                <h3
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 3,
+                  }}
+                >
+                  Join Session
+                </h3>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Enter with a Room ID</p>
               </div>
             </div>
@@ -239,7 +292,10 @@ export default function DashboardPage() {
                 className="cc-input"
                 placeholder="e.g. abc12345"
                 value={joinId}
-                onChange={(e) => { setJoinId(e.target.value); setJoinError(''); }}
+                onChange={(e) => {
+                  setJoinId(e.target.value);
+                  setJoinError('');
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && joinRoom()}
               />
             </div>
@@ -251,7 +307,10 @@ export default function DashboardPage() {
                 type="password"
                 placeholder="Leave blank if public"
                 value={joinPassword}
-                onChange={(e) => { setJoinPassword(e.target.value); setJoinError(''); }}
+                onChange={(e) => {
+                  setJoinPassword(e.target.value);
+                  setJoinError('');
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && joinRoom()}
               />
             </div>
@@ -271,59 +330,124 @@ export default function DashboardPage() {
 
         {/* Room list */}
         <div className="fade-up fade-up-3">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>Recent Rooms</h2>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 20,
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.3px',
+              }}
+            >
+              Recent Rooms
+            </h2>
             <span className="badge">{rooms.length} Active</span>
           </div>
 
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '64px 0' }}>
-              <div className="spinner" style={{
-                width: 32, height: 32,
-                border: '3px solid var(--bg-border)',
-                borderTopColor: 'var(--accent)',
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-              }} />
+              <div
+                className="spinner"
+                style={{
+                  width: 32,
+                  height: 32,
+                  border: '3px solid var(--bg-border)',
+                  borderTopColor: 'var(--accent)',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite',
+                }}
+              />
             </div>
           ) : rooms.length === 0 ? (
-            <div className="cc-card" style={{
-              textAlign: 'center', padding: '72px 32px',
-              borderStyle: 'dashed', background: 'var(--bg-card)',
-              boxShadow: 'none',
-            }}>
+            <div
+              className="cc-card"
+              style={{
+                textAlign: 'center',
+                padding: '72px 32px',
+                borderStyle: 'dashed',
+                background: 'var(--bg-card)',
+                boxShadow: 'none',
+              }}
+            >
               <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.4 }}>✨</div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>A blank canvas</h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Create a room above to start crafting elegant code.</p>
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 8,
+                }}
+              >
+                A blank canvas
+              </h3>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
+                Create a room above to start crafting elegant code.
+              </p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {rooms.map((room) => (
                 <div key={room.id} className="room-row">
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 12,
-                    background: 'var(--bg-card)', border: '1px solid var(--bg-border)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <div style={{
-                      width: 12, height: 12, borderRadius: '50%',
-                      background: LANG_COLORS[room.language] || 'var(--text-muted)',
-                    }} />
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 12,
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--bg-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        background: LANG_COLORS[room.language] || 'var(--text-muted)',
+                      }}
+                    />
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{room.name}</span>
-                        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{room.name}</span>
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}
+                    >
+                      <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {room.name}
+                      </span>
                       {!room.isPublic && <span className="badge">Private</span>}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'var(--text-muted)' }}>
-                      <span>ID: <code className="code-chip">{room.slug}</code></span>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        fontSize: 12,
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      <span>
+                        ID: <code className="code-chip">{room.slug}</code>
+                      </span>
                       <span>·</span>
                       <span style={{ textTransform: 'capitalize' }}>{room.language}</span>
                       <span>·</span>
-                      <span>{new Date(room.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                      <span>
+                        {new Date(room.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
                     </div>
                   </div>
 
@@ -333,11 +457,15 @@ export default function DashboardPage() {
                       style={{ padding: '8px 10px', fontSize: 16 }}
                       onClick={() => copyRoomLink(room.slug)}
                       title="Copy room link"
-                    >🔗</button>
+                    >
+                      🔗
+                    </button>
                     <Link href={`/room/${room.slug}`}>
                       <button className="btn-enter">Enter →</button>
                     </Link>
-                    <button className="btn-danger" onClick={() => deleteRoom(room.slug)}>Delete</button>
+                    <button className="btn-danger" onClick={() => deleteRoom(room.slug)}>
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
@@ -349,13 +477,12 @@ export default function DashboardPage() {
         <div className="cc-quote fade-up fade-up-4" style={{ paddingTop: 80 }}>
           <div className="cc-quote-divider" />
           <blockquote>
-            "Every great developer you know got there by solving problems they were once unqualified to solve."
+            &ldquo;Every great developer you know got there by solving problems they were once
+            unqualified to solve.&rdquo;
           </blockquote>
           <cite>— Patrick McKenzie</cite>
         </div>
-
       </main>
     </div>
   );
 }
-

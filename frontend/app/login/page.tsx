@@ -20,9 +20,9 @@ export default function LoginPage() {
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
       const data = await res.json();
-      if (!res.ok) { 
-        setError(data.error || 'Google Login failed'); 
-        return; 
+      if (!res.ok) {
+        setError(data.error || 'Google Login failed');
+        return;
       }
       login(data.token, data.user);
       router.push('/dashboard');
@@ -55,10 +55,21 @@ export default function LoginPage() {
               marginBottom: 10,
             }}
           >
-            <div className="cc-logo-icon" style={{ width: 38, height: 38, fontSize: 17 }}>⬡</div>
+            <div className="cc-logo-icon" style={{ width: 38, height: 38, fontSize: 17 }}>
+              ⬡
+            </div>
             CollabCode
           </div>
-          <p style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 6 }}>
+          <p
+            style={{
+              fontSize: 28,
+              fontWeight: 700,
+              fontFamily: 'Outfit, sans-serif',
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.5px',
+              marginBottom: 6,
+            }}
+          >
             Welcome back
           </p>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 400 }}>
@@ -93,7 +104,7 @@ export default function LoginPage() {
           lineHeight: 1.6,
         }}
       >
-        "Code is the closest thing to a superpower that exists in the real world."
+        &ldquo;Code is the closest thing to a superpower that exists in the real world.&rdquo;
       </p>
     </div>
   );

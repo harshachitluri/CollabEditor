@@ -14,7 +14,7 @@ if (!fs.existsSync(TEMP_DIR)) {
 // POST /api/run
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   const { code, language, input } = req.body;
-  
+
   if (!code || !language) {
     res.status(400).json({ error: 'code and language are required' });
     return;
@@ -54,7 +54,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       } catch {
         res.json({
           stdout: '',
-          stderr: 'gcc compiler not found. Please install Xcode Command Line Tools: xcode-select --install',
+          stderr:
+            'gcc compiler not found. Please install Xcode Command Line Tools: xcode-select --install',
           exitCode: 1,
         });
         return;
@@ -98,7 +99,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
   const filePath = path.join(TEMP_DIR, fileName);
   const executablePath = path.join(TEMP_DIR, `${fileId}`);
-  
+
   // For C++, compile first then execute
   if (isCpp) {
     args = [`"${filePath}"`, '-o', `"${executablePath}"`];
@@ -114,16 +115,20 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     // Function to clean up files
     const cleanup = () => {
-      try { fs.unlinkSync(filePath); } catch (e) {}
+      try {
+        fs.unlinkSync(filePath);
+      } catch (e) {}
       if (isCpp) {
-        try { fs.unlinkSync(executablePath); } catch (e) {}
+        try {
+          fs.unlinkSync(executablePath);
+        } catch (e) {}
       }
     };
 
     // For C++, first compile then execute
     if (isCpp) {
       const compileProc = spawn('g++', [filePath, '-o', executablePath], { timeout: 10000 });
-      
+
       let compileStderr = '';
       compileProc.stderr?.on('data', (data) => {
         compileStderr += data.toString();
@@ -156,8 +161,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         execProc.on('close', (exitCode) => {
           cleanup();
           res.json({
-            stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
-            stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
+            stdout:
+              stdout.length > 50000
+                ? stdout.substring(0, 50000) + '\n...[Output Truncated]'
+                : stdout.trim(),
+            stderr:
+              stderr.length > 50000
+                ? stderr.substring(0, 50000) + '\n...[Error Truncated]'
+                : stderr.trim(),
             exitCode: exitCode || 0,
           });
         });
@@ -202,17 +213,27 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
       proc.on('close', (exitCode) => {
         // Clean up file
-        try { fs.unlinkSync(filePath); } catch (e) {}
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {}
 
         res.json({
-          stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
-          stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
+          stdout:
+            stdout.length > 50000
+              ? stdout.substring(0, 50000) + '\n...[Output Truncated]'
+              : stdout.trim(),
+          stderr:
+            stderr.length > 50000
+              ? stderr.substring(0, 50000) + '\n...[Error Truncated]'
+              : stderr.trim(),
           exitCode: exitCode || 0,
         });
       });
 
       proc.on('error', (err: any) => {
-        try { fs.unlinkSync(filePath); } catch (e) {}
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {}
         res.json({
           stdout: '',
           stderr: err.message || 'Execution failed',

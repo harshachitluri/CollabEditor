@@ -57,8 +57,8 @@ npm run build
 ### Step 3: Set Environment Variables in Railway
 ```
 DATABASE_URL=file:./dev.db
-JWT_SECRET=your-secret-key-123
-JWT_REFRESH_SECRET=refresh-secret-456
+JWT_SECRET=<generate-a-random-secret>
+JWT_REFRESH_SECRET=<generate-a-random-secret>
 PORT=3001
 CLIENT_URL=https://your-frontend-vercel.vercel.app
 ```
@@ -136,8 +136,8 @@ NEXT_PUBLIC_WS_URL=wss://backend-url.com
 ### Backend (.env)
 ```env
 DATABASE_URL="file:./dev.db"  # or PostgreSQL URL
-JWT_SECRET="super-secret-key-123"
-JWT_REFRESH_SECRET="refresh-secret-456"
+JWT_SECRET="<generate-a-random-secret>"
+JWT_REFRESH_SECRET="<generate-a-random-secret>"
 PORT=3001
 CLIENT_URL="https://frontend-url.vercel.app"
 ```

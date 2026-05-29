@@ -37,8 +37,15 @@ const features = [
 
 export default function Home() {
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
-
+    <main
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        zIndex: 1,
+      }}
+    >
       {/* ── Navbar ── */}
       <nav className="cc-nav">
         <div className="cc-logo">
@@ -90,7 +97,7 @@ export default function Home() {
           <span style={{ color: 'var(--accent)' }}>without the conflicts.</span>
         </h1>
 
-          <p
+        <p
           className="fade-up fade-up-3"
           style={{
             fontSize: 18,
@@ -101,8 +108,8 @@ export default function Home() {
             fontWeight: 400,
           }}
         >
-          A collaborative code editor powered by Yjs CRDTs and an AI pair programmer.
-          Share a link, start coding — beautifully synced, no sign-up required.
+          A collaborative code editor powered by Yjs CRDTs and an AI pair programmer. Share a link,
+          start coding — beautifully synced, no sign-up required.
         </p>
 
         <div
@@ -159,7 +166,9 @@ export default function Home() {
                 >
                   {f.title}
                 </h3>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65 }}>{f.desc}</p>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
+                  {f.desc}
+                </p>
               </div>
             </div>
           ))}
@@ -170,11 +179,12 @@ export default function Home() {
       <section className="cc-quote fade-up" style={{ flex: 1 }}>
         <div className="cc-divider" />
         <blockquote>
-          "Every great developer you know got there by solving problems they were once unqualified to solve."
+          &ldquo;Every great developer you know got there by solving problems they were once
+          unqualified to solve.&rdquo;
         </blockquote>
         <cite>— Patrick McKenzie</cite>
         <p
-            style={{
+          style={{
             marginTop: 32,
             fontSize: 13,
             color: 'var(--text-muted)',
@@ -185,7 +195,6 @@ export default function Home() {
           CollabCode · Build together, grow together.
         </p>
       </section>
-
     </main>
   );
 }

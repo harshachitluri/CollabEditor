@@ -2,9 +2,10 @@
 import { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { editor } from 'monaco-editor';
+import type { RemoteCursor } from '../hooks/useSocket';
 
 // ✅ FIX 1: Dynamically import with ssr: false to prevent server-side Monaco loading
-const Editor = dynamic(() => import('@monaco-editor/react').then(mod => mod.default), {
+const Editor = dynamic(() => import('@monaco-editor/react').then((mod) => mod.default), {
   ssr: false,
   loading: () => <div style={{ width: '100%', height: '100%', background: 'var(--bg-card)' }} />,
 });
@@ -71,6 +72,9 @@ interface Props {
   onThemeChange: (theme: string) => void;
   onRun: () => void;
   running: boolean;
+  remoteCursors?: RemoteCursor[];
+  localSocketId?: string | null;
+  onCursorMove?: (line: number, column: number) => void;
 }
 
 export default function CollabEditor({
@@ -82,14 +86,83 @@ export default function CollabEditor({
   onThemeChange,
   onRun,
   running,
+  remoteCursors = [],
+  localSocketId,
+  onCursorMove,
 }: Props) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+  const remoteDecorationIdsRef = useRef<string[]>([]);
+  const lastCursorEmitTsRef = useRef(0);
   const [isClient, setIsClient] = useState(false);
 
   // ✅ FIX 2: Ensure component only renders on client to prevent hydration mismatches
   useEffect(() => {
-    setIsClient(true);
+    queueMicrotask(() => setIsClient(true));
   }, []);
+
+  useEffect(() => {
+    const ed = editorRef.current;
+    const monacoLib = monacoRef.current;
+    if (!ed || !monacoLib) return;
+
+    const model = ed.getModel();
+    if (!model) return;
+
+    const others = remoteCursors.filter((c) => c.socketId !== localSocketId);
+
+    const nextDecorations = others.map((cursor) => {
+      const safeSocketClass = cursor.socketId.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const colorClass = `cc-remote-cursor-${safeSocketClass}`;
+      const line = Math.max(1, cursor.line || 1);
+      const maxColumn = model.getLineMaxColumn(line);
+      const column = Math.min(Math.max(1, cursor.column || 1), maxColumn);
+
+      return {
+        range: new monacoLib.Range(line, column, line, column),
+        options: {
+          stickiness: monacoLib.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          before: {
+            content: '|',
+            inlineClassName: `cc-remote-cursor ${colorClass}`,
+          },
+          after: {
+            content: ` ${cursor.username}`,
+            inlineClassName: `cc-remote-cursor-label ${colorClass}`,
+          },
+          hoverMessage: { value: `${cursor.username} is here` },
+        },
+      };
+    });
+
+    remoteDecorationIdsRef.current = ed.deltaDecorations(
+      remoteDecorationIdsRef.current,
+      nextDecorations
+    );
+  }, [remoteCursors, localSocketId]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const styleId = 'cc-remote-cursor-colors';
+    const styleEl =
+      document.getElementById(styleId) ??
+      (() => {
+        const el = document.createElement('style');
+        el.id = styleId;
+        document.head.appendChild(el);
+        return el;
+      })();
+
+    const css = remoteCursors
+      .map((cursor) => {
+        const safeSocketClass = cursor.socketId.replace(/[^a-zA-Z0-9_-]/g, '_');
+        return `.cc-remote-cursor-${safeSocketClass}{--cc-remote-color:${cursor.color};}`;
+      })
+      .join('');
+
+    styleEl.textContent = css;
+  }, [remoteCursors]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -180,11 +253,19 @@ export default function CollabEditor({
             onChange={(v) => onChange(v ?? '')}
             onMount={async (ed) => {
               editorRef.current = ed;
+              if (!monacoRef.current) {
+                try {
+                  monacoRef.current = await import('monaco-editor');
+                } catch {
+                  monacoRef.current = null;
+                }
+              }
               // ✅ FIX 3: Register theme only after editor mounts on client
               // Dynamically import monaco only when needed (inside event handler)
               if (!themeRegistered) {
                 try {
-                  const monacoLib = await import('monaco-editor');
+                  const monacoLib = monacoRef.current ?? (await import('monaco-editor'));
+                  monacoRef.current = monacoLib;
                   monacoLib.editor.defineTheme('monochrome-dark', MONOCHROME_DARK_THEME);
                   themeRegistered = true;
                 } catch (err) {
@@ -192,6 +273,14 @@ export default function CollabEditor({
                   console.warn('Failed to register custom theme:', err);
                 }
               }
+
+              ed.onDidChangeCursorPosition((e) => {
+                if (!onCursorMove) return;
+                const now = Date.now();
+                if (now - lastCursorEmitTsRef.current < 80) return;
+                lastCursorEmitTsRef.current = now;
+                onCursorMove(e.position.lineNumber, e.position.column);
+              });
             }}
             options={{
               fontSize: 14,

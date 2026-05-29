@@ -24,7 +24,7 @@ router.post('/google', async (req: Request, res: Response): Promise<void> => {
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    
+
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
       res.status(400).json({ error: 'Invalid Google token' });
@@ -33,41 +33,38 @@ router.post('/google', async (req: Request, res: Response): Promise<void> => {
 
     const { email, sub: googleId, name, picture: avatarUrl } = payload;
 
-    // Check if user exists
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (user) {
-      // Update existing user with google info if needed
       if (!user.googleId || user.avatarUrl !== avatarUrl) {
         user = await prisma.user.update({
           where: { id: user.id },
-          data: { googleId, avatarUrl: avatarUrl || user.avatarUrl }
+          data: { googleId, avatarUrl: avatarUrl || user.avatarUrl },
         });
       }
     } else {
-      // Create new user
       const baseName = name ? name.replace(/\s+/g, '').toLowerCase() : email.split('@')[0];
       const username = `${baseName}-${nanoid(5)}`;
-      
+
       user = await prisma.user.create({
         data: {
           email,
           username,
           googleId,
-          avatarUrl
-        }
+          avatarUrl,
+        },
       });
     }
 
     const internalToken = generateToken(user.id);
-    res.status(200).json({ 
-      token: internalToken, 
-      user: { 
-        id: user.id, 
-        email: user.email, 
+    res.status(200).json({
+      token: internalToken,
+      user: {
+        id: user.id,
+        email: user.email,
         username: user.username,
-        avatarUrl: user.avatarUrl
-      } 
+        avatarUrl: user.avatarUrl,
+      },
     });
   } catch (err) {
     console.error('Google Auth Error:', err);

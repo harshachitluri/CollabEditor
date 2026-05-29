@@ -29,6 +29,18 @@ function setupSocket(io) {
         socket.on('language-change', ({ slug, language }) => {
             socket.to(slug).emit('language-change', { language });
         });
+        socket.on('cursor-move', ({ slug, line, column }) => {
+            const user = roomUsers.get(slug)?.get(socket.id);
+            if (!user)
+                return;
+            socket.to(slug).emit('cursor-move', {
+                socketId: socket.id,
+                username: user.username,
+                color: user.color,
+                line,
+                column,
+            });
+        });
         socket.on('chat-message', ({ slug, message, username }) => {
             io.to(slug).emit('chat-message', { socketId: socket.id, username, message, time: Date.now() });
         });

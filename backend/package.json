@@ -8,12 +8,14 @@
     "kill:port": "lsof -ti:3001 | xargs kill -9 2>/dev/null || echo 'Port 3001 is already free'",
     "build": "tsc",
     "start": "node dist/app.js",
+    "start:prod": "node dist/app.js",
     "prisma": "prisma",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +42,7 @@
     "yjs": "^13.6.30"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
