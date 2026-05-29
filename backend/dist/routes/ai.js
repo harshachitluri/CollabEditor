@@ -13,7 +13,11 @@ router.post('/chat', async (req, res) => {
     const openrouterKey = process.env.OPENROUTER_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     if (!openrouterKey && !geminiKey) {
-        res.write('data: ' + JSON.stringify({ text: '⚠️ No AI API key configured. Set OPENROUTER_API_KEY in backend .env' }) + '\n\n');
+        res.write('data: ' +
+            JSON.stringify({
+                text: '⚠️ No AI API key configured. Set OPENROUTER_API_KEY in backend .env',
+            }) +
+            '\n\n');
         res.write('data: [DONE]\n\n');
         res.end();
         return;
@@ -37,11 +41,11 @@ Be concise, clear, and friendly. If unsure, say so honestly.`;
     }
     // Convert messages to OpenAI format (OpenRouter uses OpenAI-compatible API)
     // Gemini uses 'model' role, OpenAI uses 'assistant' — map accordingly
-    const firstUserIdx = messages.findIndex(m => m.role === 'user');
+    const firstUserIdx = messages.findIndex((m) => m.role === 'user');
     const historyMsgs = firstUserIdx >= 0 ? messages.slice(firstUserIdx, -1) : [];
     const openAIMessages = [
         { role: 'system', content: SYSTEM_PROMPT },
-        ...historyMsgs.map(m => ({
+        ...historyMsgs.map((m) => ({
             role: m.role === 'model' ? 'assistant' : 'user',
             content: m.content,
         })),
@@ -78,7 +82,9 @@ Be concise, clear, and friendly. If unsure, say so honestly.`;
         if (!fetchRes.ok || !fetchRes.body) {
             const errText = await fetchRes.text();
             console.error('[AI] API error:', errText);
-            res.write('data: ' + JSON.stringify({ text: `⚠️ AI error: ${fetchRes.status} — ${errText.slice(0, 200)}` }) + '\n\n');
+            res.write('data: ' +
+                JSON.stringify({ text: `⚠️ AI error: ${fetchRes.status} — ${errText.slice(0, 200)}` }) +
+                '\n\n');
             res.write('data: [DONE]\n\n');
             res.end();
             return;
@@ -125,10 +131,23 @@ router.post('/', async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    const tokens = ['Use', 'the', '🤖 AI', 'button', 'in', 'the', 'room', 'header', 'for', 'full', 'AI', 'assistance!'];
+    const tokens = [
+        'Use',
+        'the',
+        '🤖 AI',
+        'button',
+        'in',
+        'the',
+        'room',
+        'header',
+        'for',
+        'full',
+        'AI',
+        'assistance!',
+    ];
     for (const t of tokens) {
         res.write(t + ' ');
-        await new Promise(r => setTimeout(r, 60));
+        await new Promise((r) => setTimeout(r, 60));
     }
     res.end();
 });

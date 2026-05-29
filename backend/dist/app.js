@@ -34,7 +34,11 @@ const isAllowedOrigin = (origin) => {
 };
 // Socket.IO
 exports.io = new socket_io_1.Server(server, {
-    cors: { origin: (origin, cb) => cb(null, isAllowedOrigin(origin)), methods: ['GET', 'POST'], credentials: true },
+    cors: {
+        origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
 });
 (0, socket_1.setupSocket)(exports.io);
 app.use((0, cors_1.default)({

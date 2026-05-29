@@ -156,8 +156,12 @@ router.post('/', async (req, res) => {
                 execProc.on('close', (exitCode) => {
                     cleanup();
                     res.json({
-                        stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
-                        stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
+                        stdout: stdout.length > 50000
+                            ? stdout.substring(0, 50000) + '\n...[Output Truncated]'
+                            : stdout.trim(),
+                        stderr: stderr.length > 50000
+                            ? stderr.substring(0, 50000) + '\n...[Error Truncated]'
+                            : stderr.trim(),
                         exitCode: exitCode || 0,
                     });
                 });
@@ -204,8 +208,12 @@ router.post('/', async (req, res) => {
                 }
                 catch (e) { }
                 res.json({
-                    stdout: stdout.length > 50000 ? stdout.substring(0, 50000) + '\n...[Output Truncated]' : stdout.trim(),
-                    stderr: stderr.length > 50000 ? stderr.substring(0, 50000) + '\n...[Error Truncated]' : stderr.trim(),
+                    stdout: stdout.length > 50000
+                        ? stdout.substring(0, 50000) + '\n...[Output Truncated]'
+                        : stdout.trim(),
+                    stderr: stderr.length > 50000
+                        ? stderr.substring(0, 50000) + '\n...[Error Truncated]'
+                        : stderr.trim(),
                     exitCode: exitCode || 0,
                 });
             });
