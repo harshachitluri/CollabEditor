@@ -1,41 +1,38 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setError('');
-    setLoading(true);
     try {
-      const res = await fetch(`${API}/api/auth/login`, {
+      const res = await fetch(`${API}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ token: credentialResponse.credential }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Login failed');
+        setError(data.error || 'Google Login failed');
         return;
       }
       login(data.token, data.user);
       router.push('/dashboard');
     } catch {
       setError('Network error — is the server running?');
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google Sign-In was unsuccessful. Please try again.');
   };
 
   return (
@@ -80,71 +77,18 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">
-              Email address
-            </label>
-            <input
-              id="email"
-              className="cc-input"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-            />
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            theme="outline"
+            size="large"
+            text="signin_with"
+            shape="rectangular"
+          />
 
-          <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
-            </div>
-            <input
-              id="password"
-              className="cc-input"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          {error && <div className="error-msg">⚠ {error}</div>}
-
-          <button
-            id="login-btn"
-            className="btn-primary"
-            type="submit"
-            disabled={loading}
-            style={{ width: '100%', padding: '15px', fontSize: 16, marginTop: 4, borderRadius: 12 }}
-          >
-            {loading ? 'Signing in...' : 'Sign in →'}
-          </button>
-        </form>
-
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '28px 0' }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--bg-border)' }} />
-          <span style={{ fontSize: 12, color: '#c4c9d4', fontWeight: 500 }}>OR</span>
-          <div style={{ flex: 1, height: 1, background: 'var(--bg-border)' }} />
+          {error && <div className="error-msg" style={{ width: '100%', textAlign: 'center' }}>⚠ {error}</div>}
         </div>
-
-        {/* Sign up link */}
-        <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-secondary)' }}>
-          Don&apos;t have an account?{' '}
-          <Link
-            href="/register"
-            style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
-          >
-            Create one free →
-          </Link>
-        </p>
       </div>
 
       {/* Subtle bottom quote */}

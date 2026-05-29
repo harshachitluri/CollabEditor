@@ -14,7 +14,8 @@ model User {
   id           String    @id @default(uuid())
   email        String    @unique
   username     String    @unique
-  passwordHash String
+  googleId     String?   @unique
+  avatarUrl    String?
   createdAt    DateTime  @default(now())
   rooms        Room[]    @relation("RoomOwner")
   sessions     Session[]

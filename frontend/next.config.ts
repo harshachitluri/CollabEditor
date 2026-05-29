@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Next 16 uses Turbopack by default.
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+      };
+    }
+    return config;
+  },
   turbopack: {},
 };
 
