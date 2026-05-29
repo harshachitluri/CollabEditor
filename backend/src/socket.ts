@@ -6,23 +6,8 @@ interface UserInfo {
   color: string;
 }
 
-interface CursorMovePayload {
-  slug: string;
-  line: number;
-  column: number;
-}
-
 const roomUsers = new Map<string, Map<string, UserInfo>>();
-const COLORS = [
-  '#7c3aed',
-  '#0ea5e9',
-  '#22c55e',
-  '#f59e0b',
-  '#ef4444',
-  '#ec4899',
-  '#14b8a6',
-  '#f97316',
-];
+const COLORS = ['#7c3aed', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#f97316'];
 const getColor = (idx: number) => COLORS[idx % COLORS.length];
 
 export function setupSocket(io: Server) {
@@ -36,10 +21,7 @@ export function setupSocket(io: Server) {
       const color = getColor(users.size);
       users.set(socket.id, { username, color });
 
-      socket.emit(
-        'room-users',
-        Array.from(users.entries()).map(([id, u]) => ({ socketId: id, ...u })),
-      );
+      socket.emit('room-users', Array.from(users.entries()).map(([id, u]) => ({ socketId: id, ...u })));
       socket.to(slug).emit('user-joined', { socketId: socket.id, username, color });
       console.log(`[socket] ${username} joined room ${slug}`);
     });
@@ -58,30 +40,9 @@ export function setupSocket(io: Server) {
       socket.to(slug).emit('language-change', { language });
     });
 
-    socket.on('cursor-move', ({ slug, line, column }: CursorMovePayload) => {
-      const user = roomUsers.get(slug)?.get(socket.id);
-      if (!user) return;
-
-      socket.to(slug).emit('cursor-move', {
-        socketId: socket.id,
-        username: user.username,
-        color: user.color,
-        line,
-        column,
-      });
+    socket.on('chat-message', ({ slug, message, username }: { slug: string; message: string; username: string }) => {
+      io.to(slug).emit('chat-message', { socketId: socket.id, username, message, time: Date.now() });
     });
-
-    socket.on(
-      'chat-message',
-      ({ slug, message, username }: { slug: string; message: string; username: string }) => {
-        io.to(slug).emit('chat-message', {
-          socketId: socket.id,
-          username,
-          message,
-          time: Date.now(),
-        });
-      },
-    );
 
     socket.on('disconnect', () => {
       roomUsers.forEach((users, slug) => {
