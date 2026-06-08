@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx nodemon",
     "kill:port": "lsof -ti:3001 | xargs kill -9 2>/dev/null || echo 'Port 3001 is already free'",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/app.js",
     "start:prod": "node dist/app.js",
     "prisma": "prisma",
