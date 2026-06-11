@@ -294,9 +294,6 @@ export default function CollabEditor({
               smoothScrolling: true,
               padding: { top: 16 },
               tabSize: 2,
-              // ✅ FIX 4: Disable clipboard features to prevent permission errors
-              // Monaco won't try to auto-register clipboard handlers
-              'editor.formatOnPaste': false,
               'editor.formatOnType': false,
             }}
           />
