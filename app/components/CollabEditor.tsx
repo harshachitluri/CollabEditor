@@ -294,7 +294,6 @@ export default function CollabEditor({
               smoothScrolling: true,
               padding: { top: 16 },
               tabSize: 2,
-              'editor.formatOnType': false,
             }}
           />
         )}
