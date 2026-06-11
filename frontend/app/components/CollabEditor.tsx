@@ -98,9 +98,6 @@ export default function CollabEditor({
 
   // ✅ FIX 2: Ensure component only renders on client to prevent hydration mismatches
   useEffect(() => {
-<<<<<<< Updated upstream
-    queueMicrotask(() => setIsClient(true));
-=======
     setIsClient(true);
 
     // ✅ FIX 5: Suppress Monaco's clipboard NotAllowedError which triggers Next.js error overlay
@@ -126,7 +123,7 @@ export default function CollabEditor({
     return () => {
       console.error = originalConsoleError;
     };
->>>>>>> Stashed changes
+
   }, []);
 
   useEffect(() => {

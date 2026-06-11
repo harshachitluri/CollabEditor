@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import prisma from './lib/prisma';
 
 interface UserInfo {
   userId?: string;
@@ -9,6 +10,29 @@ interface UserInfo {
 const roomUsers = new Map<string, Map<string, UserInfo>>();
 const COLORS = ['#7c3aed', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#f97316'];
 const getColor = (idx: number) => COLORS[idx % COLORS.length];
+
+// Debounce timers per room for code persistence
+const codeSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function scheduleCodeSave(slug: string, code: string) {
+  // Cancel any pending save for this room
+  if (codeSaveTimers.has(slug)) {
+    clearTimeout(codeSaveTimers.get(slug)!);
+  }
+  // Schedule a save 1.5 seconds after the last change
+  const timer = setTimeout(async () => {
+    try {
+      await prisma.room.update({
+        where: { slug },
+        data: { code },
+      });
+      codeSaveTimers.delete(slug);
+    } catch (err) {
+      // Room may have been deleted — ignore
+    }
+  }, 1500);
+  codeSaveTimers.set(slug, timer);
+}
 
 export function setupSocket(io: Server) {
   io.on('connection', (socket: Socket) => {
@@ -26,9 +50,10 @@ export function setupSocket(io: Server) {
       console.log(`[socket] ${username} joined room ${slug}`);
     });
 
-    // Code change from user
+    // Code change from user — broadcast + debounce-persist
     socket.on('code-change', ({ slug, code }: { slug: string; code: string }) => {
       socket.to(slug).emit('code-change', { code });
+      scheduleCodeSave(slug, code);
     });
 
     // Yjs Sync over Socket.IO

@@ -99,8 +99,10 @@ export default function RoomPage() {
           return;
         }
         setRoomName(room.name);
-        setLanguage(room.language || 'javascript');
-        setCode(DEFAULT_CODE[room.language] ?? DEFAULT_CODE.javascript);
+        const lang = room.language || 'javascript';
+        setLanguage(lang);
+        // ✅ Restore last saved code; fall back to default template if no code saved yet
+        setCode(room.code && room.code.trim() !== '' ? room.code : (DEFAULT_CODE[lang] ?? DEFAULT_CODE.javascript));
       })
       .catch(() => router.push('/dashboard'));
   }, [slug, router]);

@@ -82,9 +82,12 @@ Be concise, clear, and friendly. If unsure, say so honestly.`;
     }
 
     // Pick model based on which key we're using
+    // Verified free models (from openrouter.ai/api/v1/models, June 2026):
+    // - 'google/gemma-4-31b-it:free'          ← Google, great for coding
+    // - 'meta-llama/llama-3.3-70b-instruct:free' ← strong general fallback
     const model = openrouterKey
-      ? 'google/gemini-2.0-flash-lite-001' // Free working model on OpenRouter
-      : 'gemini-2.0-flash';
+      ? 'google/gemma-4-31b-it:free' // Verified free model on OpenRouter
+      : 'gemini-2.0-flash-lite';
 
     const fetchRes = await fetch(apiUrl, {
       method: 'POST',
