@@ -21,6 +21,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="theme-init" strategy="beforeInteractive">
           {`(() => { try { const key = 'collabcode-theme'; const stored = localStorage.getItem(key); const theme = stored === 'light' || stored === 'dark' ? stored : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.setAttribute('data-theme', theme); document.documentElement.style.colorScheme = theme; } catch (e) {} })();`}
         </Script>
+        <Script id="mock-clipboard" strategy="beforeInteractive">
+          {`
+            if (typeof navigator !== 'undefined' && navigator.clipboard) {
+              if (navigator.clipboard.readText) {
+                const origRead = navigator.clipboard.readText;
+                navigator.clipboard.readText = function() {
+                  return origRead.apply(this, arguments).catch(err => {
+                    if (err.name === 'NotAllowedError') return '';
+                    throw err;
+                  });
+                };
+              }
+              if (navigator.clipboard.writeText) {
+                const origWrite = navigator.clipboard.writeText;
+                navigator.clipboard.writeText = function() {
+                  return origWrite.apply(this, arguments).catch(err => {
+                    if (err.name === 'NotAllowedError') return Promise.resolve();
+                    throw err;
+                  });
+                };
+              }
+            }
+          `}
+        </Script>
         <ThemeProvider>
           <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'PLACEHOLDER'}>
             <AuthProvider>{children}</AuthProvider>

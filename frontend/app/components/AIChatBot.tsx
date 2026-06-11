@@ -47,7 +47,7 @@ function renderContent(text: string) {
       <pre
         key={key++}
         style={{
-          background: '#f8fafc',
+          background: 'var(--bg-primary)',
           border: '1px solid var(--bg-border)',
           borderRadius: 8,
           padding: '12px 14px',
@@ -258,7 +258,7 @@ export default function AIChatBot({ code, language, onClose }: Props) {
       style={{
         width: '100%',
         height: '100%',
-        background: 'white',
+        background: 'var(--bg-card)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -388,7 +388,7 @@ export default function AIChatBot({ code, language, onClose }: Props) {
             ) : (
               <div
                 style={{
-                  background: '#ffffff',
+                  background: 'var(--bg-secondary)',
                   border: '1px solid var(--bg-border)',
                   borderRadius: '2px 12px 12px 12px',
                   padding: '12px 14px',

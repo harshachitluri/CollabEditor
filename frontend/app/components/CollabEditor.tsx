@@ -10,7 +10,7 @@ const Editor = dynamic(() => import('@monaco-editor/react').then((mod) => mod.de
   loading: () => <div style={{ width: '100%', height: '100%', background: 'var(--bg-card)' }} />,
 });
 
-const LANGUAGES = ['javascript', 'typescript', 'python', 'java', 'c', 'cpp', 'go', 'rust', 'ruby'];
+const LANGUAGES = ['javascript', 'python', 'java', 'c', 'cpp'];
 const THEMES = [
   { value: 'monochrome-dark', label: 'Monochrome Dark' },
   { value: 'hc-black', label: 'High Contrast' },
@@ -98,7 +98,35 @@ export default function CollabEditor({
 
   // ✅ FIX 2: Ensure component only renders on client to prevent hydration mismatches
   useEffect(() => {
+<<<<<<< Updated upstream
     queueMicrotask(() => setIsClient(true));
+=======
+    setIsClient(true);
+
+    // ✅ FIX 5: Suppress Monaco's clipboard NotAllowedError which triggers Next.js error overlay
+    const originalConsoleError = console.error;
+    console.error = (...args: any[]) => {
+      try {
+        // Aggressively check if ANY argument contains NotAllowedError or clipboard
+        const isNotAllowed = args.some(arg => {
+          if (!arg) return false;
+          const str = typeof arg === 'string' ? arg : (arg.message || arg.name || String(arg));
+          return str.includes('NotAllowedError') || str.includes('clipboard denied') || str.includes('request is not allowed');
+        });
+        
+        if (isNotAllowed) {
+          return; // Completely silently suppress this specific error
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+      originalConsoleError.apply(console, args as [any, ...any[]]);
+    };
+
+    return () => {
+      console.error = originalConsoleError;
+    };
+>>>>>>> Stashed changes
   }, []);
 
   useEffect(() => {

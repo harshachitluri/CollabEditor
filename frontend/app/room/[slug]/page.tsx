@@ -12,15 +12,11 @@ import ThemeToggle from '../../components/ThemeToggle';
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const DEFAULT_CODE: Record<string, string> = {
-  javascript: '// Welcome to CollabCode!\nconsole.log("Hello, world!");\n',
-  typescript:
-    'const greet = (name: string): string => `Hello, ${name}!`;\nconsole.log(greet("world"));\n',
-  python: '# Welcome to CollabCode!\nprint("Hello, world!")\n',
-  java: 'public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, world!");\n  }\n}\n',
-  go: 'package main\n\nimport "fmt"\n\nfunc main() {\n  fmt.Println("Hello, world!")\n}\n',
-  rust: 'fn main() {\n  println!("Hello, world!");\n}\n',
-  cpp: '#include <iostream>\nint main() {\n  std::cout << "Hello, world!" << std::endl;\n  return 0;\n}\n',
-  c: '#include <stdio.h>\nint main() {\n  printf("Hello, world!\\n");\n  return 0;\n}\n',
+  javascript: '// Welcome to CollabCode!\\nconsole.log("Hello, world!");\\n',
+  python: '# Welcome to CollabCode!\\nprint("Hello, world!")\\n',
+  java: 'public class Main {\\n  public static void main(String[] args) {\\n    System.out.println("Hello, world!");\\n  }\\n}\\n',
+  cpp: '#include <iostream>\\nint main() {\\n  std::cout << "Hello, world!" << std::endl;\\n  return 0;\\n}\\n',
+  c: '#include <stdio.h>\\nint main() {\\n  printf("Hello, world!\\\\n");\\n  return 0;\\n}\\n',
 };
 
 interface RunResult {
@@ -367,7 +363,7 @@ export default function RoomPage() {
             >
               <div className="panel-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>TERMINAL OUTPUT</span>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>EXECUTION PANEL</span>
                   {output && (
                     <span
                       style={{
@@ -384,79 +380,99 @@ export default function RoomPage() {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Stdin:</span>
-                    <input
-                      type="text"
-                      placeholder="Input..."
-                      value={stdinInput}
-                      onChange={(e) => setStdinInput(e.target.value)}
-                      className="input-field"
-                      style={{ padding: '4px 8px', fontSize: 12, width: 150, height: 28 }}
-                      title="Text here will be sent as input (stdin) when you click Run"
-                    />
-                  </div>
-                  <button
-                    onClick={() => setOutputOpen(false)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--text-muted)',
-                      cursor: 'pointer',
-                      fontSize: 16,
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
+                <button
+                  onClick={() => setOutputOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: 16,
+                  }}
+                >
+                  ✕
+                </button>
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  overflow: 'auto',
-                  padding: 16,
-                  fontFamily: '"JetBrains Mono", monospace',
-                  fontSize: 13,
-                  lineHeight: 1.6,
-                  background: '#ffffff',
-                }}
-              >
-                {!output && running && (
+              
+              <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+                {/* Input Column */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #2c3038' }}>
+                  <div style={{ padding: '8px 16px', background: '#16181b', color: '#e6e6e6', fontSize: 12, fontWeight: 600, borderBottom: '1px solid #2c3038' }}>
+                    Standard Input (stdin)
+                  </div>
+                  <textarea
+                    value={stdinInput}
+                    onChange={(e) => setStdinInput(e.target.value)}
+                    placeholder="Enter multiline input here before clicking Run..."
+                    spellCheck={false}
+                    style={{
+                      flex: 1,
+                      background: '#0a0b0d',
+                      color: '#e6e6e6',
+                      border: 'none',
+                      padding: 16,
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: 13,
+                      resize: 'none',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                {/* Output Column */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ padding: '8px 16px', background: '#16181b', color: '#e6e6e6', fontSize: 12, fontWeight: 600, borderBottom: '1px solid #2c3038' }}>
+                    Standard Output (stdout/stderr)
+                  </div>
                   <div
                     style={{
-                      color: 'var(--text-muted)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
+                      flex: 1,
+                      overflow: 'auto',
+                      padding: 16,
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                      background: '#0a0b0d',
+                      color: '#e6e6e6'
                     }}
                   >
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        border: '2px solid var(--accent)',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                      }}
-                    />{' '}
-                    Running...
+                    {!output && running && (
+                      <div
+                        style={{
+                          color: 'var(--text-muted)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 12,
+                            height: 12,
+                            border: '2px solid var(--accent)',
+                            borderTopColor: 'transparent',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite',
+                          }}
+                        />{' '}
+                        Running...
+                      </div>
+                    )}
+                    {output?.stdout && (
+                      <pre style={{ color: '#e6e6e6', whiteSpace: 'pre-wrap', margin: 0 }}>
+                        {output.stdout}
+                      </pre>
+                    )}
+                    {output?.stderr && (
+                      <pre style={{ color: 'var(--error)', whiteSpace: 'pre-wrap', margin: 0 }}>
+                        {output.stderr}
+                      </pre>
+                    )}
+                    {output && !output.stdout && !output.stderr && (
+                      <span style={{ color: 'var(--text-muted)' }}>(no output)</span>
+                    )}
                   </div>
-                )}
-                {output?.stdout && (
-                  <pre style={{ color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
-                    {output.stdout}
-                  </pre>
-                )}
-                {output?.stderr && (
-                  <pre style={{ color: 'var(--error)', whiteSpace: 'pre-wrap' }}>
-                    {output.stderr}
-                  </pre>
-                )}
-                {output && !output.stdout && !output.stderr && (
-                  <span style={{ color: 'var(--text-muted)' }}>(no output)</span>
-                )}
+                </div>
               </div>
             </div>
           )}
@@ -502,7 +518,7 @@ export default function RoomPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 16,
-                background: 'white',
+                background: '#0a0b0d',
               }}
             >
               {chatMessages.length === 0 && (
@@ -528,13 +544,13 @@ export default function RoomPage() {
                   </div>
                   <div
                     style={{
-                      background: 'var(--bg-secondary)',
+                      background: '#16181b',
                       padding: '8px 12px',
                       borderRadius: '0 12px 12px 12px',
                       fontSize: 13,
-                      color: 'var(--text-primary)',
+                      color: '#e6e6e6',
                       lineHeight: 1.5,
-                      border: '1px solid var(--bg-border)',
+                      border: '1px solid #2c3038',
                     }}
                   >
                     {msg.message}
